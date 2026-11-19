@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuscaPet - Alertas</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <script src="https://unpkg.com"></script>
+</head>
+<body>
+  <header>
+    <h1>Central de Alertas</h1>
+    <p>Preferências de notificação e informações do sistema</p>
+  </header>
+
+  <main>
+    <div class="card">
+      <h3>Notificações em Tempo Real</h3>
+      <p class="desc">Receba avisos no dispositivo sempre que um novo animal perdido ou encontrado for registrado na sua região.</p>
+      <button id="btn-notificacao">Ativar Notificações</button>
+      <button id="btn-testar-notif" class="secundario">Enviar Notificação de Teste</button>
+    </div>
+
+    <div class="card">
+      <h3>Sobre a Aplicação</h3>
+      <p class="desc" style="margin-bottom: 0;">
+        <strong>Objetivo:</strong> Agilizar a localização e o reencontro de animais domésticos por meio de geolocalização e registros fotográficos.<br><br>
+        <strong>Público-alvo:</strong> Tutores, protetores independentes e moradores da comunidade local.
+      </p>
+    </div>
+  </main>
+
+  <nav>
+    <a href="index.html"><i data-lucide="home"></i><span>Mural</span></a>
+    <a href="reportar.html"><i data-lucide="plus-circle"></i><span>Reportar</span></a>
+    <a href="detalhes.html"><i data-lucide="bookmark"></i><span>Salvos</span></a>
+    <a href="alertas.html" class="ativo"><i data-lucide="bell"></i><span>Alertas</span></a>
+  </nav>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "BuscaPet - Localização de Animais",
+  "short_name": "BuscaPet",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f2e8e1",
+  "theme_color": "#96305a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

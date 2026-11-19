@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuscaPet - Reportar Pet</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="https://unpkg.com" />
+  <script src="https://unpkg.com"></script>
+  <script src="https://unpkg.com"></script>
+</head>
+<body>
+  <header>
+    <h1>Novo Registro</h1>
+    <p>Informe os dados e marque a localização no mapa</p>
+  </header>
+
+  <main>
+    <form id="form-pet" class="card">
+      <label>Situação do Animal</label>
+      <select id="status" required>
+        <option value="Perdido">Pet Perdido (Buscando tutor)</option>
+        <option value="Encontrado">Pet Encontrado (Avistado na rua)</option>
+      </select>
+
+      <label>Nome do Pet (ou "Não identificado")</label>
+      <input type="text" id="nome" placeholder="Ex: Thor, Mel ou Não identificado" required>
+
+      <label>Características Físicas</label>
+      <textarea id="descricao" rows="3" placeholder="Raça, pelagem, porte, cor da coleira..." required></textarea>
+
+      <label>Telefone / WhatsApp de Contato</label>
+      <input type="tel" id="contato" placeholder="(67) 99999-9999" required>
+
+      <label>Fotografia do Animal</label>
+      <input type="file" id="foto" accept="image/*" capture="environment" required>
+
+      <label>Geolocalização (GPS ou clique no mapa para ajustar)</label>
+      <button type="button" id="btn-gps" class="secundario">Capturar Localização Atual (GPS)</button>
+      <input type="text" id="localizacao" placeholder="Latitude, Longitude" readonly required>
+      
+      <div id="mapa-cadastro-box" class="mapa-mini" style="margin-top: 10px;"></div>
+
+      <button type="submit">Publicar Registro</button>
+    </form>
+  </main>
+
+  <nav>
+    <a href="index.html"><i data-lucide="home"></i><span>Mural</span></a>
+    <a href="reportar.html" class="ativo"><i data-lucide="plus-circle"></i><span>Reportar</span></a>
+    <a href="detalhes.html"><i data-lucide="bookmark"></i><span>Salvos</span></a>
+    <a href="alertas.html"><i data-lucide="bell"></i><span>Alertas</span></a>
+  </nav>
+
+  <script src="app.js"></script>
+</body>
+</html>
