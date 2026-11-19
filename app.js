@@ -19,32 +19,32 @@ const petsIniciais = [
     descricao: 'Golden Retriever dócil, usa coleira azul com identificação. Visto pela última vez próximo à praça central.',
     contato: '(67) 99888-7766',
     localizacao: '-22.24920, -53.34250',
-    foto: 'https://unsplash.com',
+    foto: 'https://placedog.net',
     favorito: true
   },
   {
     id: 2,
     status: 'Encontrado',
-    nome: 'Felino Rajado',
-    descricao: 'Encontrado próximo à região central, porte médio, aparenta ser doméstico e bem cuidado.',
+    nome: 'Mel',
+    descricao: 'Cachorrinha de porte pequeno encontrada próximo à região central, muito mansa e bem cuidada.',
     contato: '(67) 99123-4567',
     localizacao: '-22.25150, -53.34600',
-    foto: 'https://unsplash.com',
+    foto: 'https://placedog.net',
     favorito: false
   }
 ];
 
 function obterPets() {
-  const dados = localStorage.getItem('buscapet_dados_v4');
+  const dados = localStorage.getItem('buscapet_dados_v5');
   if (!dados) {
-    localStorage.setItem('buscapet_dados_v4', JSON.stringify(petsIniciais));
+    localStorage.setItem('buscapet_dados_v5', JSON.stringify(petsIniciais));
     return petsIniciais;
   }
   return JSON.parse(dados);
 }
 
 function salvarPets(lista) {
-  localStorage.setItem('buscapet_dados_v4', JSON.stringify(lista));
+  localStorage.setItem('buscapet_dados_v5', JSON.stringify(lista));
 }
 
 function iniciarMapaCard(elementoId, coordsTexto) {
@@ -52,8 +52,8 @@ function iniciarMapaCard(elementoId, coordsTexto) {
   const partes = coordsTexto.split(',');
   if (partes.length < 2) return;
 
-  const lat = parseFloat(partes.at(0).trim());
-  const lon = parseFloat(partes.at(1).trim());
+  const lat = parseFloat(partes[0].trim());
+  const lon = parseFloat(partes[1].trim());
   if (isNaN(lat) || isNaN(lon)) return;
 
   const mapa = L.map(elementoId, { zoomControl: false }).setView([lat, lon], 16);
@@ -63,7 +63,7 @@ function iniciarMapaCard(elementoId, coordsTexto) {
   }).addTo(mapa);
 
   L.marker([lat, lon]).addTo(mapa);
-  setTimeout(() => mapa.invalidateSize(), 250);
+  setTimeout(() => mapa.invalidateSize(), 300);
 }
 
 function renderizarLista(containerId, apenasFavoritos) {
@@ -89,7 +89,7 @@ function renderizarLista(containerId, apenasFavoritos) {
     const textoBotao = pet.favorito ? 'Remover dos Salvos' : 'Salvar Registro';
 
     return '<div class="card">' +
-      '<img class="foto-pet" src="' + pet.foto + '" alt="' + pet.nome + '">' +
+      '<img class="foto-pet" src="' + pet.foto + '" alt="' + pet.nome + '" onerror="this.src=\'https://picsum.photos\'">' +
       '<div class="topo-card">' +
         '<span class="badge ' + classeBadge + '">' + pet.status.toUpperCase() + '</span>' +
         '<span style="font-size:12px; color:var(--texto-suave); font-weight:600;">' + pet.localizacao + '</span>' +
@@ -115,7 +115,7 @@ function alternarFavorito(id) {
   const pets = obterPets();
   const index = pets.findIndex(p => p.id === id);
   if (index !== -1) {
-    pets.at(index).favorito = !pets.at(index).favorito;
+    pets[index].favorito = !pets[index].favorito;
     salvarPets(pets);
     renderizarLista('lista-pets', false);
     renderizarLista('lista-favoritos', true);
@@ -134,6 +134,7 @@ if (mapaCadastroBox && typeof L !== 'undefined') {
 
   const marcador = L.marker([LAT_PADRAO, LON_PADRAO]).addTo(mapaCad);
   campoLocal.value = LAT_PADRAO.toFixed(5) + ', ' + LON_PADRAO.toFixed(5);
+  setTimeout(() => mapaCad.invalidateSize(), 300);
 
   mapaCad.on('click', (e) => {
     const lat = e.latlng.lat.toFixed(5);
@@ -171,7 +172,7 @@ if (formPet) {
   formPet.addEventListener('submit', (e) => {
     e.preventDefault();
     const inputFoto = document.getElementById('foto');
-    const arquivoFoto = inputFoto.files.item(0);
+    const arquivoFoto = inputFoto.files[0];
     if (!arquivoFoto) return alert('Selecione ou capture uma fotografia do animal.');
 
     const reader = new FileReader();

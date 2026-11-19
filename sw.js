@@ -1,4 +1,4 @@
-const CACHE_NAME = 'buscapet-v3';
+const CACHE_NAME = 'buscapet-v5';
 const ARQUIVOS_PARA_CACHE = [
   './',
   './index.html',
@@ -7,8 +7,7 @@ const ARQUIVOS_PARA_CACHE = [
   './alertas.html',
   './style.css',
   './app.js',
-  './manifest.json',
-  './icon.png'
+  './manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
@@ -28,9 +27,13 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
+  self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
+  if (!event.request.url.startsWith(self.location.origin)) {
+    return;
+  }
   event.respondWith(
     caches.match(event.request).then((response) => {
       return response || fetch(event.request);
