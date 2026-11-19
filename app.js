@@ -43,17 +43,13 @@ function obterPets() {
   return JSON.parse(dados);
 }
 
-function salvarPets(lista) {
-  localStorage.setItem('buscapet_dados_v5', JSON.stringify(lista));
-}
-
 function iniciarMapaCard(elementoId, coordsTexto) {
   if (typeof L === 'undefined') return;
   const partes = coordsTexto.split(',');
   if (partes.length < 2) return;
 
-  const lat = parseFloat(partes[0].trim());
-  const lon = parseFloat(partes[1].trim());
+  const lat = parseFloat(partes.at(0).trim());
+  const lon = parseFloat(partes.at(1).trim());
   if (isNaN(lat) || isNaN(lon)) return;
 
   const mapa = L.map(elementoId, { zoomControl: false }).setView([lat, lon], 16);
