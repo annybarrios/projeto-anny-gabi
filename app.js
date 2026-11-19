@@ -11,6 +11,11 @@ if ('serviceWorker' in navigator) {
 const LAT_PADRAO = -22.24920;
 const LON_PADRAO = -53.34250;
 
+// Ilustrações vetoriais embutidas para os exemplos iniciais nunca falharem (nem offline)
+const FOTO_EXEMPLO_1 = "data:image/svg+xml;utf8,<svg xmlns='http://w3.org' width='600' height='360' viewBox='0 0 600 360'><rect width='600' height='360' fill='%23e5d2c4'/><circle cx='300' cy='150' r='65' fill='%2396305a'/><ellipse cx='245' cy='125' rx='22' ry='42' transform='rotate(-20 245 125)' fill='%237a2347'/><ellipse cx='355' cy='125' rx='22' ry='42' transform='rotate(20 355 125)' fill='%237a2347'/><circle cx='280' cy='140' r='7' fill='white'/><circle cx='320' cy='140' r='7' fill='white'/><ellipse cx='300' cy='165' rx='12' ry='9' fill='%233b2f2f'/><text x='300' y='285' font-family='sans-serif' font-size='22' font-weight='bold' fill='%2396305a' text-anchor='middle'>Thor - Golden Retriever</text></svg>";
+
+const FOTO_EXEMPLO_2 = "data:image/svg+xml;utf8,<svg xmlns='http://w3.org' width='600' height='360' viewBox='0 0 600 360'><rect width='600' height='360' fill='%23f2e8e1'/><polygon points='240,120 265,65 290,115' fill='%23ca678e'/><polygon points='360,120 335,65 310,115' fill='%23ca678e'/><circle cx='300' cy='155' r='60' fill='%23ca678e'/><circle cx='280' cy='145' r='7' fill='white'/><circle cx='320' cy='145' r='7' fill='white'/><polygon points='293,165 307,165 300,174' fill='%2396305a'/><text x='300' y='285' font-family='sans-serif' font-size='22' font-weight='bold' fill='%2396305a' text-anchor='middle'>Mel - Felino Domestico</text></svg>";
+
 const petsIniciais = [
   {
     id: 1,
@@ -19,47 +24,52 @@ const petsIniciais = [
     descricao: 'Golden Retriever dócil, usa coleira azul com identificação. Visto pela última vez próximo à praça central.',
     contato: '(67) 99888-7766',
     localizacao: '-22.24920, -53.34250',
-    foto: 'https://placedog.net',
+    foto: FOTO_EXEMPLO_1,
     favorito: true
   },
   {
     id: 2,
     status: 'Encontrado',
     nome: 'Mel',
-    descricao: 'Cachorrinha de porte pequeno encontrada próximo à região central, muito mansa e bem cuidada.',
+    descricao: 'Gatinha encontrada próximo à região central, porte médio, muito mansa e bem cuidada.',
     contato: '(67) 99123-4567',
     localizacao: '-22.25150, -53.34600',
-    foto: 'https://placedog.net',
+    foto: FOTO_EXEMPLO_2,
     favorito: false
   }
 ];
 
 function obterPets() {
-  const dados = localStorage.getItem('buscapet_dados_v5');
+  const dados = localStorage.getItem('buscapet_dados_final');
   if (!dados) {
-    localStorage.setItem('buscapet_dados_v5', JSON.stringify(petsIniciais));
+    localStorage.setItem('buscapet_dados_final', JSON.stringify(petsIniciais));
     return petsIniciais;
   }
   return JSON.parse(dados);
 }
 
-function iniciarMapaCard(elementoId, coordsTexto) {
-  if (typeof L === 'undefined') return;
-  const partes = coordsTexto.split(',');
-  if (partes.length < 2) return;
+function salvarPets(lista) {
+  localStorage.setItem('buscapet_dados_final', JSON.stringify(lista));
+}
 
+function iniciarMapaCard(elementoId, coordsTexto) {
+  const box = document.getElementById(elementoId);
+  if (!box) return;
+
+  const partes = coordsTexto.split(',');
   const lat = parseFloat(partes.at(0).trim());
   const lon = parseFloat(partes.at(1).trim());
-  if (isNaN(lat) || isNaN(lon)) return;
 
-  const mapa = L.map(elementoId, { zoomControl: false }).setView([lat, lon], 16);
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap'
-  }).addTo(mapa);
-
-  L.marker([lat, lon]).addTo(mapa);
-  setTimeout(() => mapa.invalidateSize(), 300);
+  if (typeof L !== 'undefined' && !isNaN(lat) && !isNaN(lon)) {
+    const mapa = L.map(elementoId, { zoomControl: false }).setView([lat, lon], 16);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(mapa);
+    L.marker([lat, lon]).addTo(mapa);
+    setTimeout(() => mapa.invalidateSize(), 300);
+  } else {
+    box.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#f2e8e1;color:#96305a;font-weight:700;font-size:13px;">Coordenadas GPS: ' + coordsTexto + '</div>';
+  }
 }
 
 function renderizarLista(containerId, apenasFavoritos) {
@@ -79,22 +89,22 @@ function renderizarLista(containerId, apenasFavoritos) {
   container.innerHTML = pets.map(pet => {
     const coords = pet.localizacao.replace(/\s+/g, '');
     const mapDivId = 'mapa-' + containerId + '-' + pet.id;
-    const linkRota = 'https://google.com' + coords;
+    const linkRota = 'https://openstreetmap.org' + coords.split(',').at(0) + '&mlon=' + coords.split(',').at(1) + '#map=17/' + coords.replace(',', '/');
     const classeBadge = pet.status === 'Perdido' ? 'perdido' : 'encontrado';
     const classeBotao = pet.favorito ? 'secundario' : 'outline';
     const textoBotao = pet.favorito ? 'Remover dos Salvos' : 'Salvar Registro';
 
     return '<div class="card">' +
-      '<img class="foto-pet" src="' + pet.foto + '" alt="' + pet.nome + '" onerror="this.src=\'https://picsum.photos\'">' +
+      '<img class="foto-pet" src="' + pet.foto + '" alt="' + pet.nome + '">' +
       '<div class="topo-card">' +
         '<span class="badge ' + classeBadge + '">' + pet.status.toUpperCase() + '</span>' +
-        '<span style="font-size:12px; color:var(--texto-suave); font-weight:600;">' + pet.localizacao + '</span>' +
+        '<span style="font-size:12px; color:var(--texto-suave); font-weight:600;">GPS: ' + pet.localizacao + '</span>' +
       '</div>' +
       '<h3>' + pet.nome + '</h3>' +
       '<p class="desc">' + pet.descricao + '</p>' +
       '<div class="info-box">' +
         '<p><strong>Contato:</strong> ' + pet.contato + '</p>' +
-        '<p><strong>Localização:</strong> <a href="' + linkRota + '" target="_blank">Abrir rota externa</a></p>' +
+        '<p><strong>Localização:</strong> <a href="' + linkRota + '" target="_blank">Ver ponto exato no mapa</a></p>' +
       '</div>' +
       '<div id="' + mapDivId + '" class="mapa-mini"></div>' +
       '<button class="' + classeBotao + '" onclick="alternarFavorito(' + pet.id + ')">' + textoBotao + '</button>' +
@@ -111,13 +121,14 @@ function alternarFavorito(id) {
   const pets = obterPets();
   const index = pets.findIndex(p => p.id === id);
   if (index !== -1) {
-    pets[index].favorito = !pets[index].favorito;
+    pets.at(index).favorito = !pets.at(index).favorito;
     salvarPets(pets);
     renderizarLista('lista-pets', false);
     renderizarLista('lista-favoritos', true);
   }
 }
 
+// Mapa interativo na tela de Reportar (salva coordenadas e pino)
 const mapaCadastroBox = document.getElementById('mapa-cadastro-box');
 const btnGps = document.getElementById('btn-gps');
 const campoLocal = document.getElementById('localizacao');
@@ -150,11 +161,11 @@ if (mapaCadastroBox && typeof L !== 'undefined') {
             mapaCad.setView([lat, lon], 16);
             marcador.setLatLng([lat, lon]);
             campoLocal.value = lat + ', ' + lon;
-            btnGps.textContent = 'Localização GPS Atualizada';
+            btnGps.textContent = 'Localização GPS Capturada';
           },
           () => {
             btnGps.textContent = 'Capturar Localização Atual (GPS)';
-            alert('Não foi possível acessar o GPS automático. Clique diretamente no mapa abaixo para marcar o local.');
+            alert('GPS automático indisponível neste dispositivo. Clique em qualquer ponto do mapa abaixo para marcar o local exato.');
           },
           { enableHighAccuracy: true, timeout: 6000 }
         );
@@ -163,12 +174,13 @@ if (mapaCadastroBox && typeof L !== 'undefined') {
   }
 }
 
+// Salvar novo pet com foto real (câmera/galeria) e coordenadas GPS
 const formPet = document.getElementById('form-pet');
 if (formPet) {
   formPet.addEventListener('submit', (e) => {
     e.preventDefault();
     const inputFoto = document.getElementById('foto');
-    const arquivoFoto = inputFoto.files[0];
+    const arquivoFoto = inputFoto.files.item(0);
     if (!arquivoFoto) return alert('Selecione ou capture uma fotografia do animal.');
 
     const reader = new FileReader();
@@ -198,8 +210,7 @@ if (formPet) {
 function dispararNotificacao(mensagem) {
   if ('Notification' in window && Notification.permission === 'granted') {
     new Notification('BuscaPet', {
-      body: mensagem,
-      icon: './icon.png'
+      body: mensagem
     });
   }
 }
@@ -229,4 +240,3 @@ if (btnTestarNotif) {
 }
 
 renderizarLista('lista-pets', false);
-renderizarLista('lista-favoritos', true);
